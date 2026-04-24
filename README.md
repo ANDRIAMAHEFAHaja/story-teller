@@ -9,9 +9,18 @@ Mono-repo **pnpm** : application **React (Vite) + MUI** pour le front, **NestJS 
 
 Sous **Node 18** : (1) un polyfill charge **`globalThis.crypto`** avant Nest, car `@nestjs/typeorm` utilise `crypto.randomUUID()` (global absent avant Node 19) ; (2) une override pnpm ciblée **`path-scurry>lru-cache`** évite `tracingChannel` (API Node 20+) **sans** remplacer le `lru-cache` attendu par Babel / Vite (sinon erreur `_lruCache is not a constructor` sur le front).
 
+## Où se placer dans le dépôt ?
+
+Après `git clone`, tu obtiens un dossier (souvent `story-teller` ou `Story-teler`) : c’est la **racine du dépôt Git** — celle qui contient `package.json`, `pnpm-workspace.yaml` et le dossier **`apps/`**.
+
+- **C’est depuis cette racine** qu’il faut lancer **`pnpm install`**, **`pnpm dev:api`**, **`pnpm dev:web`**, etc. Les scripts du `package.json` racine orchestrent les paquets du workspace.
+- Le dossier **`apps/`** n’est pas la racine pnpm : il regroupe seulement **`apps/api`** (NestJS) et **`apps/web`** (Vite). Il n’y a pas de `package.json` directement dans `apps/`, donc **`cd apps` puis `pnpm install` ne suffit pas** pour installer tout le mono-repo.
+
+Si tu ouvres le projet dans l’IDE, ouvre le **dossier racine du clone** (parent de `apps/`), pas uniquement `apps/api` ou `apps/web`, pour que les chemins et le workspace correspondent au README.
+
 ## Installation
 
-À la racine du dépôt dans apps:
+À la **racine du dépôt** (le dossier qui contient `pnpm-workspace.yaml`) :
 
 ```bash
 pnpm install
@@ -41,7 +50,7 @@ Variables :
 
 ## Lancer en local
 
-Deux terminaux :
+Toujours depuis la **racine du dépôt** (même dossier que pour `pnpm install`). Deux terminaux :
 
 **1. API**
 
@@ -77,11 +86,15 @@ L’interface est sur `http://localhost:5173`. Le proxy Vite redirige `/api` ver
 ## Structure du dépôt
 
 ```text
-apps/
-  api/    # NestJS
-  web/    # React + Vite + MUI
-pnpm-workspace.yaml
+<racine du clone>/
+  package.json          # scripts dev:api, dev:web, build…
+  pnpm-workspace.yaml
+  apps/
+    api/                # NestJS
+    web/                # React + Vite + MUI
 ```
+
+Les applications « vivent » sous **`apps/`**, mais les **commandes pnpm du README se lancent à la racine** (`<racine du clone>/`), pas dans `apps/`.
 
 La persistance utilise **SQLite via sql.js** (WebAssembly, pas de binaire natif) : pas de conflit `NODE_MODULE_VERSION` quand tu passes de Node 22 à Node 18 ou l’inverse. Le fichier est créé / mis à jour automatiquement (`autoSave` + `synchronize: true`, usage limité au développement / démo).
 
