@@ -1,0 +1,16 @@
+{
+  "name": "story-teler",
+  "private": true,
+  "scripts": {
+    "dev:api": "pnpm --filter api start:dev",
+    "dev:web": "pnpm --filter web dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint"
+  },
+  "packageManager": "pnpm@8.6.2",
+  "pnpm": {
+    "overrides": {
+      "path-scurry>lru-cache": "10.4.3"
+    }
+  }
+}
